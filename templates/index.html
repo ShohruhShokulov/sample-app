@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sample App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>You are calling me from {{ request.environ.get('HTTP_X_REAL_IP', request.remote_addr) }}</h1>
+</body>
+</html>
