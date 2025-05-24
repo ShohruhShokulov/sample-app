@@ -1,10 +1,142 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sample App</title>
+    <title>Enhanced Sample App - CI/CD Pipeline</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-    <h1>You are calling me from {{ request.environ.get('HTTP_X_REAL_IP', request.remote_addr) }}</h1>
+    <div class="container">
+        <h1>You are calling me from {{ request.environ.get('HTTP_X_REAL_IP', request.remote_addr) }}</h1>
+        
+        <div class="api-section">
+            <h2>🚀 Enhanced API Features</h2>
+            
+            <!-- Weather API Section -->
+            <div class="api-card">
+                <h3>🌤️ Weather API</h3>
+                <input type="text" id="cityInput" placeholder="Enter city name" value="London">
+                <button onclick="getWeather()">Get Weather</button>
+                <div id="weatherResult" class="result"></div>
+            </div>
+            
+            <!-- Random Fact API Section -->
+            <div class="api-card">
+                <h3>🎲 Random Fact API</h3>
+                <button onclick="getRandomFact()">Get Random Fact</button>
+                <div id="factResult" class="result"></div>
+            </div>
+            
+            <!-- System Info API Section -->
+            <div class="api-card">
+                <h3>💻 System Information</h3>
+                <button onclick="getSystemInfo()">Get System Info</button>
+                <div id="systemResult" class="result"></div>
+            </div>
+            
+            <!-- Health Check API Section -->
+            <div class="api-card">
+                <h3>❤️ Health Check</h3>
+                <button onclick="healthCheck()">Check Health</button>
+                <div id="healthResult" class="result"></div>
+            </div>
+            
+            <!-- Echo API Section -->
+            <div class="api-card">
+                <h3>📡 Echo API</h3>
+                <textarea id="echoInput" placeholder='{"message": "Hello World"}'>{"test": "data"}</textarea>
+                <button onclick="testEcho()">Test Echo</button>
+                <div id="echoResult" class="result"></div>
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <h2>📋 Available API Endpoints</h2>
+            <ul>
+                <li><strong>GET /api/weather/{city}</strong> - Get weather information</li>
+                <li><strong>GET /api/fact</strong> - Get random fact</li>
+                <li><strong>GET /api/system</strong> - Get system information</li>
+                <li><strong>GET /api/health</strong> - Health check</li>
+                <li><strong>GET/POST /api/echo</strong> - Echo test endpoint</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        async function getWeather() {
+            const city = document.getElementById('cityInput').value;
+            try {
+                const response = await fetch(`/api/weather/${city}`);
+                const data = await response.json();
+                document.getElementById('weatherResult').innerHTML = 
+                    `<strong>${data.city}</strong><br>
+                     Temperature: ${data.temperature}°C<br>
+                     Description: ${data.description}<br>
+                     Humidity: ${data.humidity}%`;
+            } catch (error) {
+                document.getElementById('weatherResult').innerHTML = 
+                    '<span class="error">Weather service currently unavailable</span>';
+            }
+        }
+
+        async function getRandomFact() {
+            try {
+                const response = await fetch('/api/fact');
+                const data = await response.json();
+                document.getElementById('factResult').innerHTML = 
+                    `<p>${data.fact}</p>`;
+            } catch (error) {
+                document.getElementById('factResult').innerHTML = 
+                    '<span class="error">Fact service unavailable</span>';
+            }
+        }
+
+        async function getSystemInfo() {
+            try {
+                const response = await fetch('/api/system');
+                const data = await response.json();
+                document.getElementById('systemResult').innerHTML = 
+                    `Container ID: ${data.container_id}<br>
+                     Environment: ${data.environment}<br>
+                     App Version: ${data.app_version}<br>
+                     Time: ${new Date(data.current_time).toLocaleString()}`;
+            } catch (error) {
+                document.getElementById('systemResult').innerHTML = 
+                    '<span class="error">System info unavailable</span>';
+            }
+        }
+
+        async function healthCheck() {
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                document.getElementById('healthResult').innerHTML = 
+                    `<span class="success">Status: ${data.status.toUpperCase()}</span><br>
+                     Version: ${data.version}<br>
+                     Checked: ${new Date(data.timestamp).toLocaleString()}`;
+            } catch (error) {
+                document.getElementById('healthResult').innerHTML = 
+                    '<span class="error">Health check failed</span>';
+            }
+        }
+
+        async function testEcho() {
+            try {
+                const input = document.getElementById('echoInput').value;
+                const response = await fetch('/api/echo', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: input
+                });
+                const data = await response.json();
+                document.getElementById('echoResult').innerHTML = 
+                    `<strong>Echo Response:</strong><br>
+                     <pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                document.getElementById('echoResult').innerHTML = 
+                    '<span class="error">Echo test failed</span>';
+            }
+        }
+    </script>
 </body>
 </html>
